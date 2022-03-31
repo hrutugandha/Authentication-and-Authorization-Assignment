@@ -27,4 +27,4 @@ const authorise = (permittedRoles) => {
 }
 
 
-module.exports = authorise
+module.exports = authorise;

@@ -1,17 +1,32 @@
-const express = require('express');
+const express = require("express");
+const connect = require("./configs/db");
+const userController = require("./controllers/user.controller")
 
+const {register,login, generateToken} = require("./controllers/auth.controller")
 const app = express();
+const passport = require("./configs/google-oauth")
+
 
 app.use(express.json());
 
-const userController = require('./controllers/user.controller');
 
-const {register,signup} = require('./controllers/auth.controller');
-//const authController = require('./controllers/auth.controller');
+app.use("/users", userController)
 
+app.post("/register", register)
 
-app.use("/users",userController);
-app.post("/register", register);
-app.post("/signup", signup);
+app.post("/signup", signup)
+
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] }));
+ 
+app.get(
+'/auth/google/callback', 
+  passport.authenticate('google', { failureRedirect: '/login', session:false } ),
+
+  function(req, res) {
+    const token = generateToken(req.user)
+    return res.status(200).send({user:req.user, token})
+  }
+)
 
 module.exports = app;
